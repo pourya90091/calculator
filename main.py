@@ -17,58 +17,70 @@ class Calculator(App):
         )
 
 
-        # -------- content layout --------
-        inputs = GridLayout(cols=3)
+        # -------- inputs layout --------
+        inputs_layout = GridLayout(cols=3)
         self.times = []
         while len(self.times) < 12:
-            time = TextInput(multiline=False, font_size="50sp")
+            time = TextInput(
+                multiline=False,
+                font_size="50sp",
+                background_color="gray",
+                cursor_color="red",
+                foreground_color="white")
             self.times.append(time)
-            inputs.add_widget(time)
+            inputs_layout.add_widget(time)
 
 
         # -------- footer layout --------
-        submitButton = Button(
+        calculate_button = Button(
             text="calculate",
             font_size="20sp",
             background_color=(1, 0, 1, 1)
         )
 
-        submitButton.bind(on_press=self.press_key)
+        calculate_button.bind(on_press=self.press_key)
 
-        response = Label(
-            text="Response : ",
+        result_label = Label(
+            text="result",
             font_size="20sp",
             color=[0, 1, 0, 1]
         )
-        self.response = response
+        self.result_label = result_label
     
         footer_layout = GridLayout(cols=2, size_hint=(1, 0.2))
-        footer_layout.add_widget(submitButton)
-        footer_layout.add_widget(response)
+        footer_layout.add_widget(calculate_button)
+        footer_layout.add_widget(result_label)
 
 
         # -------- main layout --------
         box_layout = BoxLayout(orientation="vertical")
         box_layout.add_widget(header_label)
-        box_layout.add_widget(inputs)
+        box_layout.add_widget(inputs_layout)
         box_layout.add_widget(footer_layout)
 
         return box_layout
 
-    
-    def press_key(self, event):
-        taked_times = (self.times)
 
+    def press_key(self, event):
         times = []
-        for time in taked_times:
+        for time in self.times:
             times.append(time.text)
-        
+
         for i in range(len(times)):
             if type(times[i]) is str and len(times[i]) == 0:
                 continue
-            hour = re.findall(r"(\w{1,2}):\w{1,2}", times[i])[0]
-            minute = re.findall(r"\w{1,2}:(\w{1,2})", times[i])[0]
-            hour, minute = int(hour), int(minute)
+
+            try:
+                hour = re.findall(r"^([0-9]{1,2}):[0-9]{1,2}$", times[i])[0]
+                minute = re.findall(r"^[0-9]{1,2}:([0-9]{1,2})$", times[i])[0]
+
+                hour, minute = int(hour), int(minute)
+
+                if minute > 60:
+                    raise IndexError
+            except IndexError:
+                self.result_label.text = "error"
+                return 1
 
             times[i] = (hour * 60) + minute
 
@@ -76,13 +88,15 @@ class Calculator(App):
         for i in range(len(times)):
             if type(times[i]) is str and len(times[i]) == 0:
                 continue
+
             total_time += times[i]
 
         hour = int(total_time / 60)
-
         minute = total_time - (hour * 60)
 
-        self.response.text = f"{hour}:{minute}"
+        self.result_label.text = str(hour).zfill(2) + ":" + str(minute).zfill(2)
+
+        return 0
 
 
 if __name__ == "__main__":
