@@ -16,7 +16,6 @@ class Calculator(App):
             size_hint=(1, 0.2)
         )
 
-
         # -------- inputs layout --------
         inputs_layout = GridLayout(cols=3)
         self.times = []
@@ -26,10 +25,10 @@ class Calculator(App):
                 font_size="50sp",
                 background_color="gray",
                 cursor_color="red",
-                foreground_color="white")
+                foreground_color="white"
+            )
             self.times.append(time)
             inputs_layout.add_widget(time)
-
 
         # -------- footer layout --------
         calculate_button = Button(
@@ -50,7 +49,6 @@ class Calculator(App):
         footer_layout = GridLayout(cols=2, size_hint=(1, 0.2))
         footer_layout.add_widget(calculate_button)
         footer_layout.add_widget(result_label)
-
 
         # -------- main layout --------
         box_layout = BoxLayout(orientation="vertical")
@@ -82,7 +80,7 @@ class Calculator(App):
                 self.result_label.text = "error"
                 return 1
 
-            times[i] = (hour * 60) + minute
+            times[i] = (hour * 60) + minute # replaced with total minutes
 
         total_time = 0
         for i in range(len(times)):
@@ -91,8 +89,8 @@ class Calculator(App):
 
             total_time += times[i]
 
-        hour = int(total_time / 60)
-        minute = total_time - (hour * 60)
+        hour = int(total_time / 60) # get hour part (full hours)
+        minute = total_time - (hour * 60) # get minute part (remaining minutes)
 
         self.result_label.text = str(hour).zfill(2) + ":" + str(minute).zfill(2)
 
